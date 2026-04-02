@@ -1,43 +1,88 @@
-# Add Images Interactive
+# Add Images
 
-This repository contains the code for the **Add Images Interactive**, designed to help **2nd grade students** practice **basic addition up to 10** using engaging visuals. By combining groups of images, learners strengthen their understanding of addition as “putting together” and “increasing.”
+React (JSX) applet: **apple** and **orange** icons (Tailwind-drawn circles) render in counts **`apples`** and **`oranges`**. The learner sets three steppers **`inputApples`**, **`inputOranges`**, **`inputAnswer`** (each **1–10**) to match **`a + b = a+b`**, then **Check!**. Correct → **canvas-confetti**, success line + random praise, new problem after **3s**. Wrong → brief **shake** on the button (inline `shake` keyframes from `AddImages.css`).
 
----
+**Live site:** [https://content-interactives.github.io/add_images](https://content-interactives.github.io/add_images)
 
-## 🔗 Live Interactive
-
-Try it out here:  
-👉 https://content-interactives.github.io/add_images
+Standards and curriculum: [Standards.md](Standards.md).
 
 ---
 
-## 🌐 Where This Interactive Is Being Used
+## Stack
 
-This interactive is currently featured in the following locations:
-
-- <img width="20" height="20" alt="image" src="https://github.com/user-attachments/assets/5d12571f-8e12-4441-98ab-c0bc94069a96" /> **CK-12 Intent Response**  
-  - 👉 PRODUCTION: [PENDING]  
-  - 👉 MASTER: [PENDING]  
-- 📘 **CK-12 Flexbooks**  
-  - 👉 [PENDING: Book/lesson link where this interactive appears]  
-
----
-
-## 📚 Standards & Subjects
-
-This interactive aligns with the following topics and standards:
-
-- **📂 Subject Area**: Elementary Math (Grade 2)  
-- **➕ Topic**: Addition within 10 using objects and images  
-- **📏 Common Core**:  
-  - **CCSS.MATH.CONTENT.1.OA.C.5** – Relate counting to addition and subtraction.  
-  - **CCSS.MATH.CONTENT.1.OA.C.6** – Add and subtract within 20, demonstrating fluency for addition and subtraction within 10.  
-  - **CCSS.MATH.CONTENT.2.OA.B.2** – Fluently add and subtract within 20 using mental strategies.  
+| Layer | Notes |
+|--------|--------|
+| Build | Vite 7, `@vitejs/plugin-react` |
+| UI | React 19 (`.jsx` only—**not** TypeScript) |
+| Styling | Tailwind 3, `AddImages.css` (`@keyframes shake`) |
+| Effects | `canvas-confetti` |
+| Deploy | `gh-pages -d dist`, `predeploy` → `vite build` |
 
 ---
 
-## 🛠️ Developer Notes
+## Layout
 
-- **Built with**: React, TypeScript, Vite, Tailwind CSS  
-- **Deployed via**: GitHub Pages  
-- **See**: `src/`, `public/`, `package.json`, `vite.config.js`, and `tailwind.config.js` in the repository
+```
+vite.config.js          # base: '/add_images/'
+src/
+  main.jsx → App.jsx → components/AddImages.jsx
+  components/AddImages.css
+  components/ui/reused-ui/Container.jsx
+```
+
+---
+
+## `generateImages`
+
+1. **`total`** = uniform **3…10** (`Math.floor(Math.random() * 8) + 3`).
+2. **`maxApples`** = `min(total - 1, 9)`; **`minApples`** = `max(1, total - 9)` so **`oranges = total - apples`** stays in **[1, 9]** when **`apples`** is chosen in range.
+3. **`randomApples`** uniform in **[minApples, maxApples]**; **`oranges = total - randomApples`**.
+4. **`setApples` / `setOranges`** drive the two `Array.from({ length: n })` grids (no shared `Items` module—markup is inlined).
+
+---
+
+## `checkAnswer`
+
+- **Correct iff** **`inputApples + inputOranges === inputAnswer`** (numeric equality, not string compare to a canonical equation).
+- For a correct response, the learner must match both **counts** to the picture and the **sum** to **`apples + oranges`** (initial steppers default to **1**, so the first check is usually wrong until adjusted).
+
+**Timeouts:** **3s** then reset inputs to **1** and **`generateImages()`**; no guard against overlapping timeouts if the user spams Check (low risk in practice).
+
+---
+
+## `Container`
+
+- **`showSoundButton={true}`** with **no `onSound`**.
+- **`showResetButton={false}`**.
+
+---
+
+## `vite.config.js`
+
+**`base: '/add_images/'`** must match the GitHub Pages project path.
+
+---
+
+## Scripts
+
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` | Vite dev server |
+| `npm run build` | `dist/` |
+| `npm run preview` | Preview build |
+| `npm run lint` | ESLint |
+| `npm run deploy` | Build + gh-pages |
+
+---
+
+## Embedding
+
+- Fixed-height **`Container`** chrome (~500px); fruit grid is a centered flex wrap of **48×48**-ish icons (`w-12 h-12`).
+
+---
+
+## Maintenance
+
+- Remove unused **`useRef`** and **`useCallback`** imports from `AddImages.jsx`.
+- **`animate-pulse`** on the Check button while shaking may fight the inline **`shake`** animation—pick one if motion looks odd.
+- Optionally block **Check** while **`showAnswer`** is true (already only success UI is shown).
