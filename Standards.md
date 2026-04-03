@@ -38,6 +38,6 @@ This interactive aligns with the following topics and standards:
 
 ## 🛠️ Developer Notes
 
-- **Built with**: React, TypeScript, Vite, Tailwind CSS  
+- **Built with**: React (JSX), Vite, Tailwind CSS  
 - **Deployed via**: GitHub Pages  
 - **See**: `src/`, `public/`, `package.json`, `vite.config.js`, and `tailwind.config.js` in the repository
